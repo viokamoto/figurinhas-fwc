@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Figurinhas — Copa 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-dark:#0d2b1f;
+    --pitch-line: rgba(245,241,230,0.08);
+    --cream:#f5f1e4;
+    --cream-dim:#e8e2d0;
+    --gold:#c99a3a;
+    --gold-bright:#eec766;
+    --falta:#c4432f;
+    --falta-dim:#7a2c20;
+    --repete:#2f7a72;
+    --repete-dim:#1c4a45;
+    --ink:#12241c;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% -10%, rgba(201,154,58,0.10), transparent 45%),
+      repeating-linear-gradient(0deg, var(--pitch-line) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(90deg, var(--pitch-line) 0 1px, transparent 1px 64px),
+      var(--pitch-dark);
+    color:var(--cream);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  header{margin-bottom:36px;text-align:center;}
+  .kicker{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.35em;
+    font-size:11px;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:clamp(38px, 7vw, 64px);
+    letter-spacing:0.03em;
+    margin:0;
+    line-height:0.95;
+    color:var(--cream);
+  }
+  h1 span{color:var(--gold-bright);}
+  .subtitle{
+    max-width:520px;margin:14px auto 0;
+    font-size:14px;line-height:1.6;
+    color:rgba(245,241,230,0.65);
+  }
+
+  .inputs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:28px;
+  }
+  @media (max-width:760px){ .inputs{grid-template-columns:1fr;} }
+
+  .panel{
+    background:rgba(245,241,230,0.04);
+    border:1px solid rgba(245,241,230,0.12);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    position:relative;
+  }
+  .panel.falta{border-top:3px solid var(--falta);}
+  .panel.repete{border-top:3px solid var(--repete);}
+
+  .panel-title{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .panel-title h2{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:22px;letter-spacing:0.04em;
+    margin:0;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.falta{background:var(--falta);}
+  .dot.repete{background:var(--repete);}
+
+  textarea{
+    width:100%;
+    min-height:150px;
+    resize:vertical;
+    background:var(--ink);
+    color:var(--cream);
+    border:1px solid rgba(245,241,230,0.15);
+    border-radius:8px;
+    padding:12px 14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    line-height:1.6;
+    outline:none;
+  }
+  textarea:focus{border-color:var(--gold);}
+  textarea::placeholder{color:rgba(245,241,230,0.32);}
+
+  .panel-actions{
+    display:flex;gap:10px;margin-top:12px;
+  }
+  button{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    border-radius:7px;
+    border:none;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-primary.falta{background:var(--falta);color:var(--cream);}
+  .btn-primary.repete{background:var(--repete);color:var(--cream);}
+  .btn-primary:hover{filter:brightness(1.1);}
+  .btn-ghost{
+    background:transparent;
+    color:rgba(245,241,230,0.7);
+    border:1px solid rgba(245,241,230,0.25);
+  }
+  .btn-ghost:hover{color:var(--cream);border-color:var(--cream);}
+
+  .float-tray{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    z-index:50;
+    background:var(--ink);
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.45);
+    display:flex;
+    align-items:center;
+    gap:16px;
+    transform:translateY(140%);
+    opacity:0;
+    transition:transform .25s ease, opacity .25s ease;
+    pointer-events:none;
+  }
+  .float-tray.visible{
+    transform:translateY(0);
+    opacity:1;
+    pointer-events:auto;
+  }
+  .tray-counts{display:flex;gap:14px;}
+  .tray-count{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:46px;
+  }
+  .tray-count .n{
+    font-size:20px;
+    font-weight:700;
+    line-height:1;
+  }
+  .tray-count.falta .n{color:var(--falta);}
+  .tray-count.repete .n{color:var(--repete);}
+  .tray-count .lbl{
+    font-size:9px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:rgba(245,241,230,0.55);
+  }
+  .tray-divider{
+    width:1px;
+    align-self:stretch;
+    background:rgba(245,241,230,0.15);
+  }
+  .tray-actions{display:flex;gap:8px;}
+  .tray-actions button{padding:8px 12px;font-size:12px;}
+
+  @media (max-width:640px){
+    .float-tray{
+      left:0;right:0;bottom:0;
+      border-radius:0;
+      border:none;
+      border-top:1px solid var(--gold);
+      justify-content:space-between;
+      padding:12px 16px;
+      transform:translateY(100%);
+    }
+    .float-tray.visible{transform:translateY(0);}
+    .tray-counts{gap:10px;}
+    .tray-count{min-width:38px;}
+    .tray-count .n{font-size:17px;}
+    .tray-actions{gap:6px;}
+    .tray-actions button{padding:8px 10px;font-size:11.5px;}
+  }
+
+  section.results h2.section-heading{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:26px;
+    letter-spacing:0.05em;
+    display:flex;align-items:center;gap:10px;
+    margin:34px 0 16px;
+    padding-bottom:8px;
+    border-bottom:1px solid rgba(245,241,230,0.15);
+  }
+  .section-heading.falta{color:var(--falta);}
+  .section-heading.falta::before{content:"";width:10px;height:10px;background:var(--falta);border-radius:2px;display:inline-block;}
+  .section-heading.repete{color:var(--repete);}
+  .section-heading.repete::before{content:"";width:10px;height:10px;background:var(--repete);border-radius:2px;display:inline-block;}
+
+  .empty-msg{
+    font-size:13px;color:rgba(245,241,230,0.4);
+    font-style:italic;padding:6px 2px 20px;
+  }
+
+  .team-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+    gap:12px;
+  }
+  .team-card{
+    background:var(--cream);
+    color:var(--ink);
+    border-radius:8px;
+    padding:12px 12px 10px;
+    box-shadow:0 3px 0 rgba(0,0,0,0.25);
+  }
+  .team-name{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.04em;
+    margin-bottom:9px;
+    display:flex;justify-content:space-between;align-items:baseline;
+    color:var(--ink);
+  }
+  .team-name .count{
+    font-weight:500;
+    font-size:10.5px;
+    color:rgba(18,36,28,0.5);
+  }
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    position:relative;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:12px;
+    min-width:30px;
+    text-align:center;
+    padding:5px 7px;
+    border-radius:6px;
+    border:1.5px solid transparent;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .08s ease, filter .1s ease;
+    color:var(--cream);
+  }
+  .chip:hover{filter:brightness(1.12);}
+  .chip:active{transform:scale(0.94);}
+  .chip.falta{background:var(--falta-dim);}
+  .chip.repete{background:var(--repete-dim);}
+  .chip .badge{
+    position:absolute;top:-7px;right:-7px;
+    background:var(--gold);
+    color:var(--ink);
+    font-size:9px;
+    font-weight:700;
+    border-radius:50%;
+    width:16px;height:16px;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1;
+  }
+  .chip.selected{
+    border-color:var(--gold-bright);
+    background:var(--gold);
+    color:var(--ink);
+    box-shadow:0 0 0 3px rgba(238,199,102,0.25);
+  }
+  .chip.selected.falta{background:var(--gold);}
+  .chip.selected.repete{background:var(--gold);}
+
+  footer{
+    text-align:center;
+    margin-top:50px;
+    font-size:11.5px;
+    color:rgba(245,241,230,0.35);
+    font-family:'JetBrains Mono',monospace;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Copa do Mundo 2026 · Álbum de Figurinhas</div>
+    <h1>Faltantes &amp; <span>Repetidas</span></h1>
+    <p class="subtitle">Cole sua lista de figurinhas, gere o painel e clique nos números para marcar quais você quer trocar.</p>
+  </header>
+
+  <div class="inputs">
+    <div class="panel falta">
+      <div class="panel-title">
+        <h2><span class="dot falta"></span>Faltantes</h2>
+      </div>
+      <textarea id="inputFaltantes" placeholder="Cole aqui o texto das figurinhas FALTANTES, ex:&#10;MEX 🇲🇽: 3, 4, 5, 7, 8&#10;USA 🇺🇸: 2, 3, 4, 6"></textarea>
+      <div class="panel-actions">
+        <button class="btn-primary falta" onclick="renderAll()">Gerar painel</button>
+        <button class="btn-ghost" onclick="clearInput('inputFaltantes')">Limpar campo</button>
+      </div>
+    </div>
+
+    <div class="panel repete">
+      <div class="panel-title">
+        <h2><span class="dot repete"></span>Repetidas</h2>
+      </div>
+      <textarea id="inputRepetidas" placeholder="Cole aqui o texto das figurinhas REPETIDAS, ex:&#10;MEX 🇲🇽: 2 (×2), 18, 19&#10;KOR 🇰🇷: 8 (×4), 12 (×2)"></textarea>
+      <div class="panel-actions">
+        <button class="btn-primary repete" onclick="renderAll()">Gerar painel</button>
+        <button class="btn-ghost" onclick="clearInput('inputRepetidas')">Limpar campo</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="results">
+    <h2 class="section-heading falta">Faltantes</h2>
+    <div id="gridFaltantes" class="team-grid"></div>
+    <div id="emptyFaltantes" class="empty-msg">Cole o texto acima e clique em "Gerar painel".</div>
+
+    <h2 class="section-heading repete">Repetidas</h2>
+    <div id="gridRepetidas" class="team-grid"></div>
+    <div id="emptyRepetidas" class="empty-msg">Cole o texto acima e clique em "Gerar painel".</div>
+  </section>
+
+  <footer>feito para organizar troca de figurinhas — nenhum dado sai do seu navegador</footer>
+</div>
+
+<div id="floatTray" class="float-tray">
+  <div class="tray-counts">
+    <div class="tray-count falta">
+      <span class="n" id="trayFaltaCount">0</span>
+      <span class="lbl">Faltantes</span>
+    </div>
+    <div class="tray-count repete">
+      <span class="n" id="trayRepeteCount">0</span>
+      <span class="lbl">Repetidas</span>
+    </div>
+  </div>
+  <div class="tray-divider"></div>
+  <div class="tray-actions">
+    <button class="btn-ghost" onclick="copySelection()">Copiar</button>
+    <button class="btn-ghost" onclick="clearSelection()">Limpar</button>
+  </div>
+</div>
+
+<script>
+let selected = new Set();
+
+function clearInput(id){
+  document.getElementById(id).value = '';
+}
+
+function parseList(raw){
+  const teams = [];
+  const lines = raw.split('\n');
+  for (let line of lines){
+    line = line.trim();
+    if (!line) continue;
+    const idx = line.indexOf(':');
+    if (idx === -1) continue;
+    const teamName = line.slice(0, idx).trim();
+    const rest = line.slice(idx + 1).trim();
+    if (!teamName || !rest) continue;
+    const parts = rest.split(',');
+    const numbers = [];
+    for (let p of parts){
+      p = p.trim();
+      if (!p) continue;
+      const m = p.match(/^(\S+)\s*\(×(\d+)\)$/u);
+      if (m){
+        numbers.push({num: m[1], qty: parseInt(m[2], 10)});
+      } else {
+        numbers.push({num: p, qty: 1});
+      }
+    }
+    if (numbers.length){
+      teams.push({team: teamName, numbers});
+    }
+  }
+  return teams;
+}
+
+function numSortKey(n){
+  const v = parseInt(n, 10);
+  return isNaN(v) ? 9999 : v;
+}
+
+function renderGrid(containerId, emptyId, teams, kind){
+  const container = document.getElementById(containerId);
+  const empty = document.getElementById(emptyId);
+  container.innerHTML = '';
+  if (!teams.length){
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  teams.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+
+    const nameRow = document.createElement('div');
+    nameRow.className = 'team-name';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = t.team;
+    const countSpan = document.createElement('span');
+    countSpan.className = 'count';
+    countSpan.textContent = t.numbers.length + (t.numbers.length === 1 ? ' item' : ' itens');
+    nameRow.appendChild(nameSpan);
+    nameRow.appendChild(countSpan);
+    card.appendChild(nameRow);
+
+    const row = document.createElement('div');
+    row.className = 'chip-row';
+
+    const sorted = [...t.numbers].sort((a,b) => numSortKey(a.num) - numSortKey(b.num));
+
+    sorted.forEach(item => {
+      const key = kind + '|' + t.team + '|' + item.num;
+      const chip = document.createElement('div');
+      chip.className = 'chip ' + kind + (selected.has(key) ? ' selected' : '');
+      chip.textContent = item.num;
+      chip.dataset.key = key;
+      if (item.qty > 1){
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = 'x' + item.qty;
+        chip.appendChild(badge);
+      }
+      chip.addEventListener('click', () => toggleChip(key, chip));
+      row.appendChild(chip);
+    });
+
+    card.appendChild(row);
+    container.appendChild(card);
+  });
+}
+
+function toggleChip(key, chipEl){
+  if (selected.has(key)){
+    selected.delete(key);
+    chipEl.classList.remove('selected');
+  } else {
+    selected.add(key);
+    chipEl.classList.add('selected');
+  }
+  updateSelCount();
+}
+
+function updateSelCount(){
+  let faltaCount = 0, repeteCount = 0;
+  selected.forEach(key => {
+    if (key.startsWith('falta|')) faltaCount++;
+    else if (key.startsWith('repete|')) repeteCount++;
+  });
+  document.getElementById('trayFaltaCount').textContent = faltaCount;
+  document.getElementById('trayRepeteCount').textContent = repeteCount;
+  const tray = document.getElementById('floatTray');
+  if (selected.size > 0){
+    tray.classList.add('visible');
+  } else {
+    tray.classList.remove('visible');
+  }
+}
+
+function clearSelection(){
+  selected.clear();
+  updateSelCount();
+  renderAll(true);
+}
+
+function copySelection(){
+  if (!selected.size){
+    alert('Nenhuma figurinha selecionada ainda.');
+    return;
+  }
+  const byKind = {falta: {}, repete: {}};
+  selected.forEach(key => {
+    const [kind, team, num] = key.split('|');
+    if (!byKind[kind][team]) byKind[kind][team] = [];
+    byKind[kind][team].push(num);
+  });
+  let text = '';
+  if (Object.keys(byKind.falta).length){
+    text += 'FALTANTES SELECIONADAS:\n';
+    for (const team in byKind.falta){
+      text += team + ': ' + byKind.falta[team].sort((a,b)=>numSortKey(a)-numSortKey(b)).join(', ') + '\n';
+    }
+  }
+  if (Object.keys(byKind.repete).length){
+    if (text) text += '\n';
+    text += 'REPETIDAS SELECIONADAS:\n';
+    for (const team in byKind.repete){
+      text += team + ': ' + byKind.repete[team].sort((a,b)=>numSortKey(a)-numSortKey(b)).join(', ') + '\n';
+    }
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Seleção copiada para a área de transferência!');
+  }).catch(() => {
+    prompt('Copie o texto abaixo:', text);
+  });
+}
+
+function renderAll(keepScroll){
+  const rawFaltantes = document.getElementById('inputFaltantes').value;
+  const rawRepetidas = document.getElementById('inputRepetidas').value;
+  const teamsFaltantes = parseList(rawFaltantes);
+  const teamsRepetidas = parseList(rawRepetidas);
+  renderGrid('gridFaltantes', 'emptyFaltantes', teamsFaltantes, 'falta');
+  renderGrid('gridRepetidas', 'emptyRepetidas', teamsRepetidas, 'repete');
+  updateSelCount();
+}
+
+renderAll();
+</script>
+</body>
+</html>
