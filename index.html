@@ -18,6 +18,11 @@
     --falta-dim:#7a2c20;
     --repete:#2f7a72;
     --repete-dim:#1c4a45;
+    --give:#9a5fc9;
+    --give-dim:#4f2e6b;
+    --receive:#3aa0c9;
+    --receive-dim:#1d4f63;
+    --compare:#d1812f;
     --ink:#12241c;
     --radius:10px;
   }
@@ -77,6 +82,59 @@
   }
   .panel.falta{border-top:3px solid var(--falta);}
   .panel.repete{border-top:3px solid var(--repete);}
+  .panel.mine{border-top:3px solid var(--gold);}
+  .panel.compare{border-top:3px solid var(--compare); margin-bottom:0;}
+  .compare-hint{font-size:11.5px;color:rgba(245,241,230,0.55);margin:-2px 0 10px;line-height:1.5;}
+  .dot.compare{background:var(--compare);}
+  .dot.mine{background:var(--gold);}
+  .btn-primary.compare{background:var(--compare);color:var(--cream);}
+
+  .field-group{margin-top:14px;}
+  .field-group:first-of-type{margin-top:4px;}
+  .field-label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    font-weight:700;
+    color:rgba(245,241,230,0.85);
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .field-count{
+    font-weight:500;
+    font-size:11px;
+    text-transform:none;
+    letter-spacing:normal;
+    color:var(--gold-bright);
+  }
+  .field-actions{display:flex;justify-content:flex-end;margin-top:6px;}
+  .field-actions button{padding:6px 12px;font-size:11.5px;}
+
+  .grid-count{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    font-weight:500;
+    color:rgba(245,241,230,0.5);
+    letter-spacing:normal;
+    text-transform:none;
+  }
+
+  .compare-cta{
+    display:flex;
+    justify-content:center;
+    margin:22px 0 8px;
+  }
+  .btn-primary.compare-main{
+    background:var(--gold-bright);
+    color:var(--ink);
+    font-size:15px;
+    padding:13px 32px;
+    border-radius:9px;
+    box-shadow:0 4px 0 rgba(0,0,0,0.3);
+  }
+  .btn-primary.compare-main:hover{filter:brightness(1.05);}
+  .btn-primary.compare-main:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,0.3);}
 
   .panel-title{
     display:flex;align-items:center;justify-content:space-between;
@@ -108,6 +166,7 @@
   }
   textarea:focus{border-color:var(--gold);}
   textarea::placeholder{color:rgba(245,241,230,0.32);}
+  .field-group textarea{min-height:110px;}
 
   .panel-actions{
     display:flex;gap:10px;margin-top:12px;
@@ -173,6 +232,8 @@
   }
   .tray-count.falta .n{color:var(--falta);}
   .tray-count.repete .n{color:var(--repete);}
+  .tray-count.give .n{color:var(--give);}
+  .tray-count.receive .n{color:var(--receive);}
   .tray-count .lbl{
     font-size:9px;
     letter-spacing:0.08em;
@@ -218,6 +279,19 @@
   .section-heading.falta::before{content:"";width:10px;height:10px;background:var(--falta);border-radius:2px;display:inline-block;}
   .section-heading.repete{color:var(--repete);}
   .section-heading.repete::before{content:"";width:10px;height:10px;background:var(--repete);border-radius:2px;display:inline-block;}
+  .section-heading.give{color:var(--give);}
+  .section-heading.give::before{content:"";width:10px;height:10px;background:var(--give);border-radius:2px;display:inline-block;}
+  .section-heading.receive{color:var(--receive);}
+  .section-heading.receive::before{content:"";width:10px;height:10px;background:var(--receive);border-radius:2px;display:inline-block;}
+  .section-divider{
+    margin:44px 0 6px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:rgba(245,241,230,0.35);
+  }
 
   .empty-msg{
     font-size:13px;color:rgba(245,241,230,0.4);
@@ -270,6 +344,8 @@
   .chip:active{transform:scale(0.94);}
   .chip.falta{background:var(--falta-dim);}
   .chip.repete{background:var(--repete-dim);}
+  .chip.give{background:var(--give-dim);}
+  .chip.receive{background:var(--receive-dim);}
   .chip .badge{
     position:absolute;top:-7px;right:-7px;
     background:var(--gold);
@@ -304,58 +380,88 @@
 
   <header>
     <div class="kicker">Copa do Mundo 2026 · Álbum de Figurinhas</div>
-    <h1>Faltantes &amp; <span>Repetidas</span></h1>
-    <p class="subtitle">Cole sua lista de figurinhas, gere o painel e clique nos números para marcar quais você quer trocar.</p>
+    <h1>Trocas de <span>Figurinhas</span></h1>
+    <p class="subtitle">Cole suas figurinhas e as da outra pessoa, clique em "Comparar listas" e veja só as trocas possíveis entre vocês.</p>
   </header>
 
   <div class="inputs">
-    <div class="panel falta">
+    <div class="panel mine">
       <div class="panel-title">
-        <h2><span class="dot falta"></span>Faltantes</h2>
+        <h2><span class="dot mine"></span>Suas figurinhas</h2>
       </div>
-      <textarea id="inputFaltantes" placeholder="Cole aqui o texto das figurinhas FALTANTES, ex:&#10;MEX 🇲🇽: 3, 4, 5, 7, 8&#10;USA 🇺🇸: 2, 3, 4, 6"></textarea>
-      <div class="panel-actions">
-        <button class="btn-primary falta" onclick="renderAll()">Gerar painel</button>
-        <button class="btn-ghost" onclick="clearInput('inputFaltantes')">Limpar campo</button>
+
+      <div class="field-group">
+        <div class="field-label">
+          <span>Faltantes</span>
+          <span class="field-count" id="countMyFaltantes">0 figurinhas</span>
+        </div>
+        <textarea id="inputMyFaltantes" oninput="updateFieldCount('inputMyFaltantes','countMyFaltantes')" placeholder="MEX 🇲🇽: 3, 4, 5, 7, 8&#10;USA 🇺🇸: 2, 3, 4, 6"></textarea>
+        <div class="field-actions">
+          <button class="btn-ghost" onclick="clearInput('inputMyFaltantes'); updateFieldCount('inputMyFaltantes','countMyFaltantes')">Limpar</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">
+          <span>Repetidas</span>
+          <span class="field-count" id="countMyRepetidas">0 figurinhas</span>
+        </div>
+        <textarea id="inputMyRepetidas" oninput="updateFieldCount('inputMyRepetidas','countMyRepetidas')" placeholder="MEX 🇲🇽: 2 (×2), 18, 19&#10;KOR 🇰🇷: 8 (×4), 12 (×2)"></textarea>
+        <div class="field-actions">
+          <button class="btn-ghost" onclick="clearInput('inputMyRepetidas'); updateFieldCount('inputMyRepetidas','countMyRepetidas')">Limpar</button>
+        </div>
       </div>
     </div>
 
-    <div class="panel repete">
+    <div class="panel compare">
       <div class="panel-title">
-        <h2><span class="dot repete"></span>Repetidas</h2>
+        <h2><span class="dot compare"></span>Figurinhas da outra pessoa</h2>
       </div>
-      <textarea id="inputRepetidas" placeholder="Cole aqui o texto das figurinhas REPETIDAS, ex:&#10;MEX 🇲🇽: 2 (×2), 18, 19&#10;KOR 🇰🇷: 8 (×4), 12 (×2)"></textarea>
-      <div class="panel-actions">
-        <button class="btn-primary repete" onclick="renderAll()">Gerar painel</button>
-        <button class="btn-ghost" onclick="clearInput('inputRepetidas')">Limpar campo</button>
+
+      <div class="field-group">
+        <div class="field-label">
+          <span>Faltantes dela</span>
+          <span class="field-count" id="countHerFaltantes">0 figurinhas</span>
+        </div>
+        <textarea id="inputHerFaltantes" oninput="updateFieldCount('inputHerFaltantes','countHerFaltantes')" placeholder="MEX 🇲🇽: 3, 5, 7&#10;USA 🇺🇸: 2, 4"></textarea>
+        <div class="field-actions">
+          <button class="btn-ghost" onclick="clearInput('inputHerFaltantes'); updateFieldCount('inputHerFaltantes','countHerFaltantes')">Limpar</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">
+          <span>Repetidas dela</span>
+          <span class="field-count" id="countHerRepetidas">0 figurinhas</span>
+        </div>
+        <textarea id="inputHerRepetidas" oninput="updateFieldCount('inputHerRepetidas','countHerRepetidas')" placeholder="MEX 🇲🇽: 8, 9 (×2)&#10;USA 🇺🇸: 10"></textarea>
+        <div class="field-actions">
+          <button class="btn-ghost" onclick="clearInput('inputHerRepetidas'); updateFieldCount('inputHerRepetidas','countHerRepetidas')">Limpar</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <section class="results">
-    <h2 class="section-heading falta">Faltantes</h2>
-    <div id="gridFaltantes" class="team-grid"></div>
-    <div id="emptyFaltantes" class="empty-msg">Cole o texto acima e clique em "Gerar painel".</div>
+  <div class="compare-cta">
+    <button class="btn-primary compare-main" onclick="compareLists()">Comparar listas</button>
+  </div>
 
-    <h2 class="section-heading repete">Repetidas</h2>
-    <div id="gridRepetidas" class="team-grid"></div>
-    <div id="emptyRepetidas" class="empty-msg">Cole o texto acima e clique em "Gerar painel".</div>
+  <section class="results">
+    <h2 class="section-heading give">Você pode dar (ela precisa) <span class="grid-count" id="giveCount"></span></h2>
+    <div id="gridGive" class="team-grid"></div>
+    <div id="emptyGive" class="empty-msg">Cole as listas acima e clique em "Comparar listas".</div>
+
+    <h2 class="section-heading receive">Você pode receber (ela tem sobrando) <span class="grid-count" id="receiveCount"></span></h2>
+    <div id="gridReceive" class="team-grid"></div>
+    <div id="emptyReceive" class="empty-msg">Cole as listas acima e clique em "Comparar listas".</div>
   </section>
 
   <footer>feito para organizar troca de figurinhas — nenhum dado sai do seu navegador</footer>
 </div>
 
+
 <div id="floatTray" class="float-tray">
-  <div class="tray-counts">
-    <div class="tray-count falta">
-      <span class="n" id="trayFaltaCount">0</span>
-      <span class="lbl">Faltantes</span>
-    </div>
-    <div class="tray-count repete">
-      <span class="n" id="trayRepeteCount">0</span>
-      <span class="lbl">Repetidas</span>
-    </div>
-  </div>
+  <div class="tray-counts" id="trayCounts"></div>
   <div class="tray-divider"></div>
   <div class="tray-actions">
     <button class="btn-ghost" onclick="copySelection()">Copiar</button>
@@ -467,14 +573,29 @@ function toggleChip(key, chipEl){
   updateSelCount();
 }
 
+const KIND_LABELS = {
+  falta: 'Faltantes',
+  repete: 'Repetidas',
+  give: 'Você dá',
+  receive: 'Você recebe'
+};
+
 function updateSelCount(){
-  let faltaCount = 0, repeteCount = 0;
+  const counts = {falta:0, repete:0, give:0, receive:0};
   selected.forEach(key => {
-    if (key.startsWith('falta|')) faltaCount++;
-    else if (key.startsWith('repete|')) repeteCount++;
+    const kind = key.split('|')[0];
+    if (counts[kind] !== undefined) counts[kind]++;
   });
-  document.getElementById('trayFaltaCount').textContent = faltaCount;
-  document.getElementById('trayRepeteCount').textContent = repeteCount;
+  const trayCounts = document.getElementById('trayCounts');
+  trayCounts.innerHTML = '';
+  Object.keys(KIND_LABELS).forEach(kind => {
+    if (counts[kind] > 0){
+      const div = document.createElement('div');
+      div.className = 'tray-count ' + kind;
+      div.innerHTML = '<span class="n">' + counts[kind] + '</span><span class="lbl">' + KIND_LABELS[kind] + '</span>';
+      trayCounts.appendChild(div);
+    }
+  });
   const tray = document.getElementById('floatTray');
   if (selected.size > 0){
     tray.classList.add('visible');
@@ -486,7 +607,7 @@ function updateSelCount(){
 function clearSelection(){
   selected.clear();
   updateSelCount();
-  renderAll(true);
+  document.querySelectorAll('.chip.selected').forEach(chip => chip.classList.remove('selected'));
 }
 
 function copySelection(){
@@ -494,26 +615,29 @@ function copySelection(){
     alert('Nenhuma figurinha selecionada ainda.');
     return;
   }
-  const byKind = {falta: {}, repete: {}};
+  const byKind = {falta: {}, repete: {}, give: {}, receive: {}};
   selected.forEach(key => {
     const [kind, team, num] = key.split('|');
     if (!byKind[kind][team]) byKind[kind][team] = [];
     byKind[kind][team].push(num);
   });
+  const titles = {
+    falta: 'FALTANTES SELECIONADAS',
+    repete: 'REPETIDAS SELECIONADAS',
+    give: 'VOCÊ DÁ (SELECIONADAS)',
+    receive: 'VOCÊ RECEBE (SELECIONADAS)'
+  };
   let text = '';
-  if (Object.keys(byKind.falta).length){
-    text += 'FALTANTES SELECIONADAS:\n';
-    for (const team in byKind.falta){
-      text += team + ': ' + byKind.falta[team].sort((a,b)=>numSortKey(a)-numSortKey(b)).join(', ') + '\n';
+  Object.keys(titles).forEach(kind => {
+    const teams = byKind[kind];
+    if (Object.keys(teams).length){
+      if (text) text += '\n';
+      text += titles[kind] + ':\n';
+      for (const team in teams){
+        text += team + ': ' + teams[team].sort((a,b)=>numSortKey(a)-numSortKey(b)).join(', ') + '\n';
+      }
     }
-  }
-  if (Object.keys(byKind.repete).length){
-    if (text) text += '\n';
-    text += 'REPETIDAS SELECIONADAS:\n';
-    for (const team in byKind.repete){
-      text += team + ': ' + byKind.repete[team].sort((a,b)=>numSortKey(a)-numSortKey(b)).join(', ') + '\n';
-    }
-  }
+  });
   navigator.clipboard.writeText(text).then(() => {
     alert('Seleção copiada para a área de transferência!');
   }).catch(() => {
@@ -521,17 +645,82 @@ function copySelection(){
   });
 }
 
-function renderAll(keepScroll){
-  const rawFaltantes = document.getElementById('inputFaltantes').value;
-  const rawRepetidas = document.getElementById('inputRepetidas').value;
-  const teamsFaltantes = parseList(rawFaltantes);
-  const teamsRepetidas = parseList(rawRepetidas);
-  renderGrid('gridFaltantes', 'emptyFaltantes', teamsFaltantes, 'falta');
-  renderGrid('gridRepetidas', 'emptyRepetidas', teamsRepetidas, 'repete');
-  updateSelCount();
+function normalizeTeam(name){
+  return name.trim().split(/\s+/)[0].toUpperCase();
 }
 
-renderAll();
+function updateFieldCount(inputId, countId){
+  const teams = parseList(document.getElementById(inputId).value);
+  const total = teams.reduce((sum, t) => sum + t.numbers.length, 0);
+  document.getElementById(countId).textContent = total + (total === 1 ? ' figurinha' : ' figurinhas');
+}
+
+function buildIndexSet(teams){
+  const set = new Set();
+  teams.forEach(t => {
+    const code = normalizeTeam(t.team);
+    t.numbers.forEach(item => set.add(code + '|' + item.num));
+  });
+  return set;
+}
+
+function filterMatched(orderedTeams, matchedSet){
+  const out = [];
+  orderedTeams.forEach(t => {
+    const code = normalizeTeam(t.team);
+    const filtered = t.numbers.filter(item => matchedSet.has(code + '|' + item.num));
+    if (filtered.length) out.push({team: t.team, numbers: filtered});
+  });
+  return out;
+}
+
+function totalItems(teams){
+  return teams.reduce((sum, t) => sum + t.numbers.length, 0);
+}
+
+function compareLists(){
+  const myFaltantes = parseList(document.getElementById('inputMyFaltantes').value);
+  const myRepetidas = parseList(document.getElementById('inputMyRepetidas').value);
+  const herFaltantes = parseList(document.getElementById('inputHerFaltantes').value);
+  const herRepetidas = parseList(document.getElementById('inputHerRepetidas').value);
+
+  updateFieldCount('inputMyFaltantes', 'countMyFaltantes');
+  updateFieldCount('inputMyRepetidas', 'countMyRepetidas');
+  updateFieldCount('inputHerFaltantes', 'countHerFaltantes');
+  updateFieldCount('inputHerRepetidas', 'countHerRepetidas');
+
+  if (!myRepetidas.length && !myFaltantes.length){
+    alert('Cole suas figurinhas (faltantes e/ou repetidas) antes de comparar.');
+    return;
+  }
+  if (!herFaltantes.length && !herRepetidas.length){
+    alert('Cole as figurinhas da outra pessoa (faltantes e/ou repetidas) antes de comparar.');
+    return;
+  }
+
+  const herFaltantesSet = buildIndexSet(herFaltantes);
+  const herRepetidasSet = buildIndexSet(herRepetidas);
+  const myFaltantesSet = buildIndexSet(myFaltantes);
+  const myRepetidasSet = buildIndexSet(myRepetidas);
+
+  const giveSet = new Set([...myRepetidasSet].filter(k => herFaltantesSet.has(k)));
+  const receiveSet = new Set([...herRepetidasSet].filter(k => myFaltantesSet.has(k)));
+
+  const giveList = filterMatched(myRepetidas, giveSet);
+  const receiveList = filterMatched(herRepetidas, receiveSet);
+
+  renderGrid('gridGive', 'emptyGive', giveList, 'give');
+  renderGrid('gridReceive', 'emptyReceive', receiveList, 'receive');
+
+  const giveTotal = totalItems(giveList);
+  const receiveTotal = totalItems(receiveList);
+  document.getElementById('giveCount').textContent = giveTotal ? ('— ' + giveTotal + (giveTotal === 1 ? ' figurinha' : ' figurinhas')) : '';
+  document.getElementById('receiveCount').textContent = receiveTotal ? ('— ' + receiveTotal + (receiveTotal === 1 ? ' figurinha' : ' figurinhas')) : '';
+
+  document.getElementById('gridGive').scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+updateSelCount();
 </script>
 </body>
 </html>
