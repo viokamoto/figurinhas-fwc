@@ -476,31 +476,30 @@ function clearInput(id){
   document.getElementById(id).value = '';
 }
 
+function extractNumbers(text){
+  const items = [];
+  const re = /(\d+)\s*(?:\((?:×|x)\s*(\d+)\))?/gi;
+  let m;
+  while ((m = re.exec(text)) !== null){
+    items.push({num: m[1], qty: m[2] ? parseInt(m[2], 10) : 1});
+  }
+  return items;
+}
+
 function parseList(raw){
   const teams = [];
   const lines = raw.split('\n');
   for (let line of lines){
     line = line.trim();
     if (!line) continue;
-    const idx = line.indexOf(':');
+    const idx = line.search(/\d/);
     if (idx === -1) continue;
-    const teamName = line.slice(0, idx).trim();
-    const rest = line.slice(idx + 1).trim();
-    if (!teamName || !rest) continue;
-    const parts = rest.split(',');
-    const numbers = [];
-    for (let p of parts){
-      p = p.trim();
-      if (!p) continue;
-      const m = p.match(/^(\S+)\s*\(×(\d+)\)$/u);
-      if (m){
-        numbers.push({num: m[1], qty: parseInt(m[2], 10)});
-      } else {
-        numbers.push({num: p, qty: 1});
-      }
-    }
+    let team = line.slice(0, idx).trim();
+    team = team.replace(/[:\-–]+$/, '').trim();
+    if (!team) continue;
+    const numbers = extractNumbers(line.slice(idx));
     if (numbers.length){
-      teams.push({team: teamName, numbers});
+      teams.push({team, numbers});
     }
   }
   return teams;
